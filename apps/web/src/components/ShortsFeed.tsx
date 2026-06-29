@@ -87,7 +87,11 @@ export default function ShortsFeed({
                   title="노컷뉴스 Shorts"
                   allow="autoplay; encrypted-media; picture-in-picture"
                   allowFullScreen
-                  onLoad={() => { if (i === active) cmd(frameRefs.current[i], "playVideo"); }}
+                  onLoad={() => {
+                    // 재생 상태 이벤트 수신 시작 (WatchList가 받아 메뉴 토글)
+                    frameRefs.current[i]?.contentWindow?.postMessage('{"event":"listening"}', "*");
+                    if (i === active) cmd(frameRefs.current[i], "playVideo");
+                  }}
                 />
               ) : (
                 <img src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" loading="lazy" />

@@ -75,9 +75,6 @@ export default function Header() {
   const isActive = (href: string) =>
     href === "/" ? path === "/" || path.startsWith("/article") : path.startsWith(href);
 
-  // Watch는 전체화면 Shorts 전용 — 헤더/플로팅탭 숨김 (홈 링크는 ShortsFeed가 오버레이)
-  if (path.startsWith("/watch")) return null;
-
   return (
     <>
       {/* ---------- 데스크톱 상단 바 (JoongAng 1min 레이아웃 참고) ---------- */}

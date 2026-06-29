@@ -140,6 +140,11 @@ button { font-family:inherit; }
   display:flex; gap:4px; padding:6px;
   background:var(--surface-slate); border:1px solid var(--image-frame);
   border-radius:var(--r-cta); box-shadow:0 8px 28px rgba(0,0,0,.20);
+  transition:opacity 220ms ease, transform 220ms ease;
+}
+/* 영상 재생 중에는 플로팅 메뉴를 숨기고(화면만), 일시정지하면 다시 슬라이드-인 */
+.media-playing .mtabs {
+  opacity:0; pointer-events:none; transform:translate(-50%,140%);
 }
 .mtab {
   flex:1; text-align:center;
