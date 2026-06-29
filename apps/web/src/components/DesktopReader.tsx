@@ -8,9 +8,11 @@ import type { Article } from "@shared/types";
 // 스크롤 중 화면 중앙에 온 기사가 "지금 보는 기사"로 표시되며 그라데이션 테두리가 돈다.
 
 function fmtDate(iso: string): string {
-  const d = new Date(iso);
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  // 한국시간(KST) 고정 — 서버(UTC) 렌더에서도 어긋나지 않게.
+  return new Date(iso).toLocaleString("ko-KR", {
+    year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Seoul",
+  });
 }
 
 const ThumbUp = (

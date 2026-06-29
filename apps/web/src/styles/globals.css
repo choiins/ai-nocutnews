@@ -180,23 +180,9 @@ button { font-family:inherit; }
   padding-bottom:12px; margin:18px 0 4px; border-bottom:1px solid var(--image-frame);
 }
 
-/* ---------- StoryStream 타임라인 ---------- */
-.stream { position:relative; padding-left:64px; margin-top:8px; }
-.stream::before {
-  content:""; position:absolute; left:52px; top:8px; bottom:0;
-  width:1px; background:var(--image-frame);
-}
+/* ---------- 카드 스트림 ---------- */
+.stream { position:relative; margin-top:8px; }
 .story { position:relative; margin-bottom:16px; }
-.story .ts {
-  position:absolute; left:-64px; top:18px; width:48px; text-align:right;
-  font-family:var(--font-mono); font-size:10px; font-weight:500;
-  letter-spacing:1px; text-transform:uppercase; color:var(--text-secondary);
-}
-.story .ts::after {
-  content:""; position:absolute; right:-13px; top:3px;
-  width:7px; height:7px; border-radius:50%;
-  background:var(--accent-fill); box-shadow:0 0 0 3px var(--canvas);
-}
 
 /* ---------- 스토리 카드 ---------- */
 .card {
@@ -219,13 +205,6 @@ button { font-family:inherit; }
   width:100%; aspect-ratio:16/9; object-fit:cover;
   border-radius:4px; margin-top:14px; border:1px solid var(--image-frame);
 }
-
-/* ---------- 톱(lead) 카드 — 스트림 안에서 살짝만 강조 ---------- */
-.card.lead { border-color:var(--accent-fill); border-width:2px; padding:22px; }
-.card.lead .kicker { color:var(--accent-secondary); }
-.card.lead .card-title { font-size:23px; line-height:1.2; }
-/* 톱 카드의 타임라인 점만 키워 위계 표시 */
-.story:first-child .ts::after { width:9px; height:9px; right:-14px; }
 
 /* ============================================================
    Watch — 세로 Shorts 피드 (스크롤-스냅 자동재생)

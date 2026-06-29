@@ -1,5 +1,6 @@
 import { getArticleById } from "@/lib/data";
 import { notFound } from "next/navigation";
+import { feedTime } from "@/lib/time";
 
 export const revalidate = 300;
 
@@ -10,12 +11,12 @@ export default async function ArticleDetail({ params }: { params: { id: string }
   return (
     <main style={{ marginTop: 8 }}>
       <article className="card" style={{ border: "none", padding: "8px 0" }}>
-        <div className="kicker">{a.ai_headline ? "SHORT" : "ORIGINAL"}</div>
+        <div className="kicker">{feedTime(a.published_at)}</div>
         <h1 style={{ fontSize: 26, fontWeight: 800, lineHeight: 1.25, margin: "8px 0 4px" }}>
           {a.ai_headline || a.title}
         </h1>
         <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-secondary)", marginBottom: 16 }}>
-          {new Date(a.published_at).toLocaleString("ko-KR", { dateStyle: "long", timeStyle: "short" })}
+          {new Date(a.published_at).toLocaleString("ko-KR", { dateStyle: "long", timeStyle: "short", timeZone: "Asia/Seoul" })}
         </div>
 
         {a.thumbnail_url && <img className="thumb" src={a.thumbnail_url} alt="" style={{ marginTop: 0 }} />}

@@ -5,6 +5,7 @@ import {
   getTopics, getTopicsBySlugs, getPersonalizedFeed, getTrendingSampleTopics,
   type FeedItem,
 } from "@/lib/topics";
+import { feedTime } from "@/lib/time";
 import type { Topic, TopicType } from "@shared/types";
 
 const TYPE_TABS: { key: TopicType; label: string }[] = [
@@ -15,18 +16,13 @@ const TYPE_TABS: { key: TopicType; label: string }[] = [
   { key: "celebrity", label: "연예" },
 ];
 
-function timeLabel(iso: string) {
-  return new Date(iso).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", hour12: false });
-}
-
-function FeedList({ feed, kicker }: { feed: FeedItem[]; kicker: string }) {
+function FeedList({ feed }: { feed: FeedItem[] }) {
   return (
     <div className="stream">
       {feed.map(({ article: a, matched }) => (
         <div className="story" key={a.id}>
-          <div className="ts">{timeLabel(a.published_at)}</div>
           <a className="card" href={`/article/${a.id}`}>
-            <div className="kicker">{kicker}</div>
+            <div className="kicker">{feedTime(a.published_at)}</div>
             <div className="card-title">{a.ai_headline || a.title}</div>
             {a.summary_short && <p className="summary">{a.summary_short}</p>}
             <div className="match-chips">
@@ -142,7 +138,7 @@ export default function LikePage() {
           {sampleFeed.length === 0 ? (
             <p className="like-hint">위에서 관심사를 선택하면 샘플 피드가 표시됩니다.</p>
           ) : (
-            <FeedList feed={sampleFeed} kicker="SAMPLE" />
+            <FeedList feed={sampleFeed} />
           )}
         </section>
       </main>
@@ -210,7 +206,7 @@ export default function LikePage() {
         ) : feed.length === 0 ? (
           <p className="like-hint">아직 관심사에 맞는 기사가 없습니다.</p>
         ) : (
-          <FeedList feed={feed} kicker="FOR YOU" />
+          <FeedList feed={feed} />
         )}
       </section>
     </main>

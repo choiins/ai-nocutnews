@@ -1,13 +1,8 @@
 import { getArticles } from "@/lib/data";
 import EmptyState from "@/components/EmptyState";
+import { feedTime } from "@/lib/time";
 
 export const revalidate = 300;
-
-function dateLabel(iso: string): string {
-  return new Date(iso).toLocaleString("ko-KR", {
-    month: "long", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false,
-  });
-}
 
 export default async function OriginalFeed() {
   const articles = await getArticles();
@@ -20,9 +15,8 @@ export default async function OriginalFeed() {
       <div className="stream">
         {articles.map((a) => (
           <div className="story" key={a.id}>
-            <div className="ts">{dateLabel(a.published_at).split(" ").slice(-1)[0]}</div>
             <a className="card" href={`/article/${a.id}`}>
-              <div className="kicker">ORIGINAL</div>
+              <div className="kicker">{feedTime(a.published_at)}</div>
               <div className="card-title">{a.title}</div>
               {a.thumbnail_url && <img className="thumb" src={a.thumbnail_url} alt="" loading="lazy" />}
               {a.body_full && (
