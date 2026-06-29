@@ -1,0 +1,15 @@
+{
+  "name": "nocut-scripts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "독립 적재 파이프라인 — RSS→OpenRouter 요약→Supabase, 스키마 마이그레이션",
+  "scripts": {
+    "migrate": "node --env-file=../apps/web/.env.local migrate.mjs",
+    "ingest": "node --env-file=../apps/web/.env.local ingest.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.45.0",
+    "pg": "8.13.1"
+  }
+}
