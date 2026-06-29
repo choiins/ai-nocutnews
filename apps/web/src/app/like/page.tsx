@@ -1,11 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession, useInterests } from "@/lib/session";
 import {
-  getTopics, getTopicsBySlugs, getPersonalizedFeed, getSampleTopics, topicName, SAMPLE_SLUGS,
+  getTopics, getTopicsBySlugs, getPersonalizedFeed, getTrendingSampleTopics,
   type FeedItem,
 } from "@/lib/topics";
-import type { TopicType } from "@shared/types";
+import type { Topic, TopicType } from "@shared/types";
 
 const TYPE_TABS: { key: TopicType; label: string }[] = [
   { key: "person", label: "인물" },
@@ -31,7 +31,7 @@ function FeedList({ feed, kicker }: { feed: FeedItem[]; kicker: string }) {
             {a.summary_short && <p className="summary">{a.summary_short}</p>}
             <div className="match-chips">
               {matched.map((m) => (
-                <span key={m} className="match-chip">#{topicName(m)}</span>
+                <span key={m} className="match-chip">#{m}</span>
               ))}
             </div>
           </a>
@@ -46,14 +46,58 @@ export default function LikePage() {
   const { slugs, add, remove } = useInterests();
   const [tab, setTab] = useState<TopicType>("issue");
   const [q, setQ] = useState("");
-  const [sample, setSample] = useState<string[]>(SAMPLE_SLUGS);
+
+  // 비로그인 샘플
+  const [trending, setTrending] = useState<Topic[]>([]);
+  const [sample, setSample] = useState<string[]>([]);
+  const [sampleFeed, setSampleFeed] = useState<FeedItem[]>([]);
+
+  // 로그인
+  const [mine, setMine] = useState<Topic[]>([]);
+  const [browse, setBrowse] = useState<Topic[]>([]);
+  const [feed, setFeed] = useState<FeedItem[]>([]);
+
+  // 비로그인: 트렌딩 토픽을 샘플로 불러와 전부 선택
+  useEffect(() => {
+    if (isLoggedIn) return;
+    let alive = true;
+    getTrendingSampleTopics().then((t) => {
+      if (!alive) return;
+      setTrending(t);
+      setSample(t.map((x) => x.slug));
+    });
+    return () => { alive = false; };
+  }, [isLoggedIn]);
+
+  // 비로그인: 선택한 샘플로 미리보기 피드
+  useEffect(() => {
+    if (isLoggedIn) return;
+    let alive = true;
+    getPersonalizedFeed(sample).then((f) => { if (alive) setSampleFeed(f); });
+    return () => { alive = false; };
+  }, [isLoggedIn, sample]);
+
+  // 로그인: 내 관심사 + 맞춤 피드
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    let alive = true;
+    getTopicsBySlugs(slugs).then((t) => { if (alive) setMine(t); });
+    getPersonalizedFeed(slugs).then((f) => { if (alive) setFeed(f); });
+    return () => { alive = false; };
+  }, [isLoggedIn, slugs]);
+
+  // 로그인: 관심사 추가 브라우즈
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    let alive = true;
+    getTopics({ type: tab, q: q || undefined, trending: true }).then((t) => { if (alive) setBrowse(t); });
+    return () => { alive = false; };
+  }, [isLoggedIn, tab, q]);
 
   if (!ready) return <main />;
 
   // ---------- 비로그인: 샘플 미리보기 ----------
   if (!isLoggedIn) {
-    const sampleTopics = getSampleTopics();
-    const feed = getPersonalizedFeed(sample);
     const toggle = (s: string) =>
       setSample((p) => (p.includes(s) ? p.filter((x) => x !== s) : [...p, s]));
     const startWithSample = () => {
@@ -73,28 +117,32 @@ export default function LikePage() {
 
         <section className="like-block">
           <div className="side-head">지금 뜨는 관심사</div>
-          <div className="chips">
-            {sampleTopics.map((t) => {
-              const on = sample.includes(t.slug);
-              return (
-                <button
-                  key={t.slug}
-                  className={`chip${on ? " chip-on" : ""}`}
-                  onClick={() => toggle(t.slug)}
-                >
-                  {on ? <>{t.name}<span className="chip-x">×</span></> : <><span className="chip-plus">+</span>{t.name}</>}
-                </button>
-              );
-            })}
-          </div>
+          {trending.length === 0 ? (
+            <p className="like-hint">관심사를 불러오는 중…</p>
+          ) : (
+            <div className="chips">
+              {trending.map((t) => {
+                const on = sample.includes(t.slug);
+                return (
+                  <button
+                    key={t.slug}
+                    className={`chip${on ? " chip-on" : ""}`}
+                    onClick={() => toggle(t.slug)}
+                  >
+                    {on ? <>{t.name}<span className="chip-x">×</span></> : <><span className="chip-plus">+</span>{t.name}</>}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         <section className="like-block">
           <div className="side-head">샘플 피드</div>
-          {feed.length === 0 ? (
+          {sampleFeed.length === 0 ? (
             <p className="like-hint">위에서 관심사를 선택하면 샘플 피드가 표시됩니다.</p>
           ) : (
-            <FeedList feed={feed} kicker="SAMPLE" />
+            <FeedList feed={sampleFeed} kicker="SAMPLE" />
           )}
         </section>
       </main>
@@ -102,10 +150,7 @@ export default function LikePage() {
   }
 
   // ---------- 로그인: 내 맞춤 피드 ----------
-  const mine = getTopicsBySlugs(slugs);
-  const browse = getTopics({ type: tab, q: q || undefined, trending: true })
-    .filter((t) => !slugs.includes(t.slug));
-  const feed = getPersonalizedFeed(slugs);
+  const browseList = browse.filter((t) => !slugs.includes(t.slug));
 
   return (
     <main>
@@ -146,10 +191,10 @@ export default function LikePage() {
           </div>
         )}
         <div className="chips">
-          {browse.length === 0 ? (
+          {browseList.length === 0 ? (
             <p className="like-hint">검색 결과가 없습니다.</p>
           ) : (
-            browse.map((t) => (
+            browseList.map((t) => (
               <button key={t.slug} className="chip" onClick={() => add(t.slug)}>
                 <span className="chip-plus">+</span>{t.name}
               </button>
