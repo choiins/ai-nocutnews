@@ -2,7 +2,7 @@ name: RSS ingest
 
 on:
   schedule:
-    - cron: '0 * * * *'      # 매시 정각(UTC) = 매시간
+    - cron: '*/5 0-14,21-23 * * *'   # KST 06:00~24:00 매 5분 (UTC 21~14시), KST 00~05시 휴식
   workflow_dispatch:
 
 concurrency:

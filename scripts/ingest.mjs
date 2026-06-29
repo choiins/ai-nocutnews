@@ -19,7 +19,9 @@ import { createClient } from "@supabase/supabase-js";
 
 const RSS_URL = "https://rss.nocutnews.co.kr/news/top.xml";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = process.env.OPENROUTER_MODEL || "moonshotai/kimi-k2.5";
+// 비추론(no-reasoning) 모델 권장 — 추론 모델은 토큰을 추론에 써 JSON이 잘려 요약이 실패한다.
+const MODEL = process.env.OPENROUTER_MODEL || "google/gemini-2.5-flash";
+const REQUEST_TIMEOUT_MS = 60_000; // 행 걸린 호출이 전체 실행을 멈추지 않도록
 
 const args = process.argv.slice(2);
 const DRY = args.includes("--dry");
@@ -127,29 +129,40 @@ ${item.body_full}
 }
 
 async function callOnce(item) {
-  const res = await fetch(OPENROUTER_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${OPENROUTER_KEY}`,
-      "Content-Type": "application/json",
-      // OpenRouter 랭킹/식별용(선택)
-      "HTTP-Referer": "https://nocut.news",
-      "X-Title": "AI Nocut News ingest",
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      max_tokens: 2048,
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: userPrompt(item) },
-      ],
-    }),
-  });
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
+  let res;
+  try {
+    res = await fetch(OPENROUTER_URL, {
+      method: "POST",
+      signal: ctrl.signal,
+      headers: {
+        Authorization: `Bearer ${OPENROUTER_KEY}`,
+        "Content-Type": "application/json",
+        // OpenRouter 랭킹/식별용(선택)
+        "HTTP-Referer": "https://nocut.news",
+        "X-Title": "AI Nocut News ingest",
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 2048,
+        response_format: { type: "json_object" },
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: userPrompt(item) },
+        ],
+      }),
+    });
+  } finally {
+    clearTimeout(timer);
+  }
   if (!res.ok) throw new Error(`OpenRouter ${res.status}: ${(await res.text()).slice(0, 200)}`);
   const data = await res.json();
-  const content = data.choices?.[0]?.message?.content;
+  const choice = data.choices?.[0];
+  const content = choice?.message?.content;
   if (!content || !content.trim()) throw new Error("빈 응답");
+  // 토큰 한도로 JSON이 잘린 경우 — 추론 모델에서 발생. 재시도/실패 처리되도록 명시적 에러.
+  if (choice.finish_reason === "length") throw new Error("응답 잘림(max_tokens 초과)");
   // 일부 모델이 ```json 펜스를 붙여올 수 있어 제거, 첫 { ~ 마지막 } 구간만 파싱
   const clean = content.replace(/```json|```/g, "").trim();
   const s = clean.indexOf("{"), e = clean.lastIndexOf("}");
