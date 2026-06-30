@@ -2,12 +2,13 @@
 import { useEffect, useRef, useState } from "react";
 import type { VideoItem } from "@/lib/youtube";
 import ShortsFeed from "@/components/ShortsFeed";
+import VideoOverlay from "@/components/VideoOverlay";
 
-// 최신순 단일 컬럼 리스트. 가로영상은 카드 자리에서 인라인 재생,
-// 쇼츠는 쇼츠만 추린 몰입(전체화면 스와이프) 피드로 띄운다.
-// 재생 중에는 플로팅 메뉴(.mtabs)를 숨기고, 일시정지하면 다시 보여준다.
+// 최신순 단일 컬럼 리스트. 가로영상·쇼츠 모두 전체화면 몰입으로 재생한다.
+// (가로영상은 16:9 풀스크린 플레이어, 쇼츠는 세로 스냅 몰입 피드)
+// 재생 중에는 헤더(.media-playing)를 숨기고, 일시정지하면 다시 보여준다.
 export default function WatchList({ videos }: { videos: VideoItem[] }) {
-  const [playingId, setPlayingId] = useState<string | null>(null); // 인라인 재생 중인 가로영상
+  const [wide, setWide] = useState<VideoItem | null>(null); // 전체화면 재생 중인 가로영상
   const [shortsStart, setShortsStart] = useState<number | null>(null); // 몰입 피드 시작 인덱스
   const playingSrc = useRef<Set<MessageEventSource>>(new Set()); // 재생 중인 iframe window 집합
 
@@ -44,12 +45,8 @@ export default function WatchList({ videos }: { videos: VideoItem[] }) {
   // 재생 상태 초기화 (오버레이 닫기 등 iframe 언마운트 시 이벤트가 안 오므로 수동 정리)
   const resetPlaying = () => {
     playingSrc.current.clear();
-    document.documentElement.classList.remove("media-playing");
+    document.documentElement.classList.remove("media-playing", "chrome-show");
   };
-
-  // iframe 로드 시 상태 이벤트 수신을 시작시키는 핸드셰이크
-  const startListening = (el: HTMLIFrameElement | null) =>
-    el?.contentWindow?.postMessage('{"event":"listening"}', "*");
 
   return (
     <>
@@ -75,34 +72,31 @@ export default function WatchList({ videos }: { videos: VideoItem[] }) {
               </button>
             );
           }
-          // 가로영상
-          const playing = playingId === v.id;
+          // 가로영상 — 탭하면 전체화면 몰입 플레이어로 재생
           return (
-            <div key={v.id} className="video-card">
+            <button key={v.id} className="video-card" onClick={() => setWide(v)}>
               <div className="video-frame wide">
-                {playing ? (
-                  <iframe
-                    src={`https://www.youtube.com/embed/${v.id}?enablejsapi=1&autoplay=1&rel=0&modestbranding=1`}
-                    title={v.title || "노컷뉴스 영상"}
-                    allow="autoplay; encrypted-media; picture-in-picture"
-                    allowFullScreen
-                    onLoad={(e) => startListening(e.currentTarget)}
-                  />
-                ) : (
-                  <button className="video-play" onClick={() => setPlayingId(v.id)} aria-label="재생">
-                    <img src={v.thumbnail} alt="" loading="lazy" />
-                    <span className="play-icon">▶</span>
-                  </button>
-                )}
+                <span className="video-play" aria-hidden="true">
+                  <img src={v.thumbnail} alt="" loading="lazy" />
+                  <span className="play-icon">▶</span>
+                </span>
               </div>
               <div className="video-meta">
                 {v.title && <div className="video-title">{v.title}</div>}
                 {v.publishedAt && <time className="video-time">{relativeTime(v.publishedAt)}</time>}
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
+
+      {wide && (
+        <VideoOverlay
+          id={wide.id}
+          title={wide.title}
+          onClose={() => { setWide(null); resetPlaying(); }}
+        />
+      )}
 
       {shortsStart !== null && shortIds.length > 0 && (
         <ShortsFeed

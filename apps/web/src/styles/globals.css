@@ -130,6 +130,7 @@ button { font-family:inherit; }
 .mobile-bar {
   display:flex; align-items:center; justify-content:space-between;
   padding:16px 0 10px; border-bottom:1px solid var(--image-frame);
+  transition:opacity 220ms ease, transform 220ms ease;
 }
 .mobile-actions { display:flex; align-items:center; gap:6px; }
 
@@ -145,6 +146,12 @@ button { font-family:inherit; }
 /* 영상 재생 중에는 플로팅 메뉴를 숨기고(화면만), 일시정지하면 다시 슬라이드-인 */
 .media-playing .mtabs {
   opacity:0; pointer-events:none; transform:translate(-50%,140%);
+}
+/* 전체화면 몰입 재생 중에는 상단 헤더(데스크톱 바·모바일 바)도 슬라이드-아웃,
+   일시정지/종료 시 .media-playing 해제로 자동 복귀. (.chrome-show면 일시 노출) */
+.media-playing:not(.chrome-show) .pc-bar,
+.media-playing:not(.chrome-show) .mobile-bar {
+  opacity:0; pointer-events:none; transform:translateY(-100%);
 }
 .mtab {
   flex:1; text-align:center;
@@ -247,6 +254,15 @@ button { font-family:inherit; }
 }
 .shorts-close:hover { background:rgba(0,0,0,.7); }
 
+/* 가로영상 전체화면 몰입 플레이어 — 16:9를 검은 배경 가운데 레터박스 */
+.video-overlay {
+  position:fixed; inset:0; z-index:30; background:#000;
+  display:flex; align-items:center; justify-content:center;
+}
+.video-overlay iframe {
+  width:100%; max-height:100%; aspect-ratio:16/9; border:0; display:block;
+}
+
 /* ------------------------------------------------------------
    Watch — 통합 영상 리스트 (쇼츠 + 가로영상, 최신순)
    ------------------------------------------------------------ */
@@ -319,6 +335,15 @@ button { font-family:inherit; }
 }
 .chip-on:hover { color:#fff; opacity:.85; }
 .chip-x { font-size:14px; line-height:1; opacity:.65; }
+.chip-disabled { opacity:.4; }
+.chip-disabled:hover { border-color:var(--image-frame); color:var(--text-primary); }
+
+/* 카테고리 10개 제한 안내 */
+.like-limit {
+  font-size:13px; line-height:1.5; color:#c0362c;
+  background:rgba(192,54,44,.08); border:1px solid rgba(192,54,44,.25);
+  border-radius:10px; padding:9px 12px; margin:0 0 12px;
+}
 
 .topic-search {
   width:100%; background:var(--canvas); color:var(--text-primary);
@@ -372,6 +397,127 @@ button { font-family:inherit; }
 .sub-cta p { margin:0 0 14px; font-size:13px; color:var(--text-secondary); }
 
 /* ============================================================
+   좋아요 버튼 (모바일 카드 등)
+   ============================================================ */
+.card-actions { display:flex; align-items:center; gap:8px; margin-top:14px; }
+.like-btn {
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--font-mono); font-size:11px; font-weight:600;
+  letter-spacing:1px; text-transform:uppercase;
+  color:var(--text-secondary); background:var(--surface-slate);
+  border:1px solid var(--image-frame); border-radius:var(--r-cta);
+  padding:7px 13px; cursor:pointer; transition:all 140ms ease;
+}
+.like-btn svg { width:16px; height:16px; }
+.like-btn:hover { border-color:var(--accent-primary); color:var(--accent-primary); }
+.like-btn.on {
+  color:#fff; background:var(--accent-fill); border-color:var(--accent-fill);
+}
+.like-btn.on svg { fill:#fff; }
+
+.liked-remove {
+  margin-top:8px; background:transparent; border:none; cursor:pointer;
+  font-family:var(--font-mono); font-size:11px; letter-spacing:1px;
+  text-transform:uppercase; color:var(--accent-primary);
+}
+.liked-remove:hover { opacity:.7; }
+
+/* ============================================================
+   인증(/me) — 로그인·회원가입·계정
+   ============================================================ */
+.auth-card { margin-top:24px; }
+.auth-title { font-size:26px; font-weight:800; line-height:1.25; margin:8px 0 8px; }
+.auth-lead { color:var(--text-muted); font-size:14px; line-height:1.6; margin:0 0 22px; }
+
+.auth-form { display:flex; flex-direction:column; gap:14px; }
+.auth-field { display:flex; flex-direction:column; gap:6px; }
+.auth-field > span {
+  font-family:var(--font-mono); font-size:11px; letter-spacing:1.2px;
+  text-transform:uppercase; color:var(--text-secondary);
+}
+.auth-input {
+  width:100%; background:var(--canvas); color:var(--text-primary);
+  border:1px solid var(--image-frame); border-radius:12px;
+  padding:12px 14px; font-size:15px; font-family:var(--font-ui);
+}
+.auth-input::placeholder { color:var(--text-secondary); }
+.auth-input:focus { outline:none; border-color:var(--accent-primary); }
+
+.auth-submit {
+  margin-top:4px; width:100%; padding:14px;
+  background:var(--accent-fill); color:#fff; border:none; border-radius:var(--r-cta);
+  font-family:var(--font-mono); font-size:13px; font-weight:600;
+  letter-spacing:1.2px; text-transform:uppercase; cursor:pointer;
+  transition:filter 160ms ease;
+}
+.auth-submit:hover { filter:brightness(1.06); }
+.auth-submit:disabled { opacity:.6; cursor:default; }
+
+.auth-toggle {
+  display:block; margin:18px auto 0; background:transparent; border:none; cursor:pointer;
+  font-size:13px; color:var(--accent-primary);
+}
+.auth-toggle:hover { text-decoration:underline; }
+
+/* 구글 로그인 버튼 — 흰 배경 + 구글 G */
+.google-btn {
+  margin-top:8px; width:100%; padding:13px;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  background:#fff; color:#1f1f1f; border:1px solid #dadce0; border-radius:var(--r-cta);
+  font-size:15px; font-weight:600; cursor:pointer;
+  transition:box-shadow 160ms ease, background 160ms ease;
+}
+.google-btn:hover { box-shadow:0 1px 4px rgba(60,64,67,.25); background:#f8f9fa; }
+.google-btn:disabled { opacity:.6; cursor:default; }
+
+.auth-error {
+  font-size:13px; line-height:1.5; color:#c0362c;
+  background:rgba(192,54,44,.08); border:1px solid rgba(192,54,44,.25);
+  border-radius:10px; padding:10px 12px; margin:0;
+}
+.auth-notice {
+  font-size:13px; line-height:1.5; color:var(--accent-primary);
+  background:var(--surface-slate); border:1px solid var(--image-frame);
+  border-radius:10px; padding:10px 12px; margin:0;
+}
+
+/* 계정 화면 */
+.me-account { display:flex; align-items:center; gap:14px; margin-top:24px; }
+.me-avatar {
+  width:52px; height:52px; flex-shrink:0; border-radius:50%;
+  background:var(--accent-fill); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px; font-weight:800;
+}
+.me-email { font-size:18px; font-weight:700; color:var(--text-primary); margin-top:2px; }
+
+.me-links { display:flex; flex-direction:column; gap:0; }
+.me-link {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:15px 4px; border-bottom:1px solid var(--image-frame);
+  font-size:15px; color:var(--text-primary);
+}
+.me-link:hover { color:var(--accent-primary); }
+
+.me-sub-card {
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+  background:var(--surface-slate); border:1px solid var(--image-frame);
+  border-radius:var(--r-feature); padding:16px 18px;
+}
+.me-sub-card b { font-size:15px; }
+.me-sub-card p { margin:4px 0 0; font-size:13px; color:var(--text-secondary); }
+.me-sub-card .subscribe-pill:disabled { opacity:.55; cursor:default; }
+
+.me-signout {
+  display:block; width:100%; margin:28px 0 8px; padding:13px;
+  background:transparent; border:1px solid var(--image-frame); border-radius:var(--r-cta);
+  font-family:var(--font-mono); font-size:12px; letter-spacing:1.2px;
+  text-transform:uppercase; color:var(--text-secondary); cursor:pointer;
+  transition:all 150ms ease;
+}
+.me-signout:hover { border-color:#c0362c; color:#c0362c; }
+
+/* ============================================================
    데스크톱(PC) — JoongAng "1min" 레이아웃 참고
    기본은 숨김, ≥1024px에서만 노출. 모바일 레이아웃과 공존한다.
    ============================================================ */
@@ -398,6 +544,7 @@ button { font-family:inherit; }
     position:sticky; top:0; z-index:60;
     background:var(--canvas);
     border-bottom:1px solid var(--image-frame);
+    transition:opacity 220ms ease, transform 220ms ease;
   }
   .pc-bar-inner {
     max-width:1180px; margin:0 auto; padding:0 32px; height:66px;
