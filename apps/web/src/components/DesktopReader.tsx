@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { Article } from "@shared/types";
+import { useLikes } from "@/lib/likes";
 
 // JoongAng "1min" 스타일 데스크톱 리더.
 // 가운데: 요약 기사 카드가 기존 방식대로 쭉 흐른다(연속 피드).
@@ -32,16 +33,9 @@ const ShareIcon = (
 export default function DesktopReader({ articles }: { articles: Article[] }) {
   const [active, setActive] = useState(0);
   const [revealed, setRevealed] = useState<boolean[]>([]);
-  const [liked, setLiked] = useState<Record<number, boolean>>({});
   const [toast, setToast] = useState("");
+  const { has: isLiked, toggle: toggleLike } = useLikes();
   const cardRefs = useRef<(HTMLElement | null)[]>([]);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("liked");
-      if (raw) setLiked(JSON.parse(raw));
-    } catch {}
-  }, []);
 
   // 화면 중앙에 들어온 기사를 활성으로 — 그라데이션 테두리 + 사이드 하이라이트
   useEffect(() => {
@@ -83,14 +77,6 @@ export default function DesktopReader({ articles }: { articles: Article[] }) {
   const flash = (m: string) => {
     setToast(m);
     window.setTimeout(() => setToast(""), 1800);
-  };
-
-  const toggleLike = (id: number) => {
-    setLiked((prev) => {
-      const next = { ...prev, [id]: !prev[id] };
-      try { localStorage.setItem("liked", JSON.stringify(next)); } catch {}
-      return next;
-    });
   };
 
   const share = async (a: Article) => {
@@ -144,11 +130,11 @@ export default function DesktopReader({ articles }: { articles: Article[] }) {
 
               <div className="jc-actions">
                 <button
-                  className={`jc-act${liked[a.id] ? " on" : ""}`}
+                  className={`jc-act${isLiked(a.id) ? " on" : ""}`}
                   onClick={() => toggleLike(a.id)}
-                  aria-pressed={!!liked[a.id]}
+                  aria-pressed={isLiked(a.id)}
                 >
-                  {ThumbUp}<span>좋아요</span>
+                  {ThumbUp}<span>{isLiked(a.id) ? "좋아요됨" : "좋아요"}</span>
                 </button>
                 <button className="jc-act" onClick={() => share(a)}>
                   {ShareIcon}<span>공유</span>

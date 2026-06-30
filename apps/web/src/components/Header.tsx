@@ -2,6 +2,7 @@
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import ThemeToggle from "./ThemeToggle";
+import { useSession } from "@/lib/session";
 
 // 플로팅 하단 탭 — short · watch · like 만
 const TABS = [
@@ -72,6 +73,7 @@ const Wordmark = ({ sm }: { sm?: boolean }) => (
 export default function Header() {
   const path = usePathname();
   const [open, setOpen] = useState(false);
+  const { isLoggedIn, ready } = useSession();
   const isActive = (href: string) =>
     href === "/" ? path === "/" || path.startsWith("/article") : path.startsWith(href);
 
@@ -127,7 +129,9 @@ export default function Header() {
             </div>
             <div className="drawer-foot" style={{ marginTop: 0 }}>
               <ThemeToggle />
-              <a href="/me" className="signin" onClick={() => setOpen(false)}>SIGN IN</a>
+              <a href="/me" className="signin" onClick={() => setOpen(false)}>
+                {ready && isLoggedIn ? "MY 계정" : "SIGN IN"}
+              </a>
             </div>
           </aside>
         </div>

@@ -1,5 +1,6 @@
 import { getArticles } from "@/lib/data";
 import DesktopReader from "@/components/DesktopReader";
+import LikeButton from "@/components/LikeButton";
 import { feedTime } from "@/lib/time";
 
 export const revalidate = 300; // ISR: 5분마다 재생성
@@ -33,6 +34,9 @@ export default async function ShortFeed() {
               <div className="card-title">{a.ai_headline || a.title}</div>
               {a.summary_short && <p className="summary">{a.summary_short}</p>}
               {a.thumbnail_url && <img className="thumb" src={a.thumbnail_url} alt="" loading="lazy" />}
+              <div className="card-actions">
+                <LikeButton id={a.id} showLabel />
+              </div>
             </a>
 
             {/* 5번째 카드마다 구독 CTA 삽입 */}

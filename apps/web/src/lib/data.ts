@@ -50,6 +50,30 @@ export async function getArticleById(id: string): Promise<Article | null> {
   return data as Article;
 }
 
+// 좋아요한 기사 일괄 조회 (published만). 최신 발행순 정렬.
+export async function getArticlesByIds(ids: number[]): Promise<Article[]> {
+  if (ids.length === 0) return [];
+  const byDate = (a: Article, b: Article) =>
+    new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
+
+  if (!isSupabaseConfigured()) {
+    noticeMock();
+    const want = new Set(ids);
+    return MOCK_ARTICLES.filter((a) => want.has(a.id)).sort(byDate);
+  }
+  const sb = getSupabase();
+  const { data, error } = await sb
+    .from("articles")
+    .select("*")
+    .in("id", ids)
+    .eq("status", "published");
+  if (error) {
+    console.error("좋아요 기사 조회 실패:", error.message);
+    return [];
+  }
+  return ((data as Article[]) ?? []).sort(byDate);
+}
+
 export async function getVideos(limit = 24): Promise<YoutubeVideo[]> {
   if (!isSupabaseConfigured()) {
     noticeMock();
