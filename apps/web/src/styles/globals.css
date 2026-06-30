@@ -202,8 +202,8 @@ button { font-family:inherit; }
   border-radius:var(--r-card); padding:18px; display:block;
 }
 .card:hover .card-title { color:var(--link-hover); }
-.card-title { font-size:19px; font-weight:700; line-height:1.25; color:var(--text-primary); }
-.card .summary { margin-top:10px; font-size:14px; line-height:1.6; color:var(--text-muted); }
+.card-title { font-size:20px; font-weight:700; line-height:1.25; color:var(--text-primary); }
+.card .summary { margin-top:10px; font-size:15px; line-height:1.6; color:var(--text-muted); }
 .card .bullets { margin:12px 0 0; padding-left:0; list-style:none; }
 .card .bullets li {
   font-size:13px; line-height:1.5; color:var(--text-secondary);
