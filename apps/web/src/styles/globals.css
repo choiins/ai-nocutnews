@@ -244,6 +244,11 @@ button { font-family:inherit; }
 .short-frame iframe, .short-frame img {
   width:100%; height:100%; border:0; display:block; object-fit:cover;
 }
+/* 가로영상 슬라이드 — 16:9를 검은 배경 가운데 레터박스로 */
+.short-frame.wide { display:flex; align-items:center; justify-content:center; }
+.short-frame.wide iframe, .short-frame.wide img {
+  width:100%; height:auto; max-height:100%; aspect-ratio:16/9; object-fit:contain;
+}
 /* 몰입 피드 닫기(✕) — 오버레이로 떴을 때 리스트로 복귀 */
 .shorts-close {
   position:fixed; top:12px; right:14px; z-index:31;
@@ -253,15 +258,6 @@ button { font-family:inherit; }
   backdrop-filter:blur(4px); transition:background 150ms ease;
 }
 .shorts-close:hover { background:rgba(0,0,0,.7); }
-
-/* 가로영상 전체화면 몰입 플레이어 — 16:9를 검은 배경 가운데 레터박스 */
-.video-overlay {
-  position:fixed; inset:0; z-index:30; background:#000;
-  display:flex; align-items:center; justify-content:center;
-}
-.video-overlay iframe {
-  width:100%; max-height:100%; aspect-ratio:16/9; border:0; display:block;
-}
 
 /* ------------------------------------------------------------
    Watch — 통합 영상 리스트 (쇼츠 + 가로영상, 최신순)
