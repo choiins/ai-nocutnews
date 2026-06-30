@@ -25,7 +25,6 @@ export default async function ShortFeed() {
 
     {/* 모바일 — 카드 스트림 (<1024px) */}
     <main className="mobile-feed">
-      <div className="side-head">Today · Short</div>
       <div className="stream">
         {articles.map((a, i) => (
           <div className="story" key={a.id}>
