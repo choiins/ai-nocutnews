@@ -95,7 +95,7 @@ export default function Header() {
           </nav>
           <div className="pc-right">
             <button className="icon-btn" aria-label="검색">{SearchIcon}</button>
-            <button className="subscribe-pill">구독</button>
+            <a href="/me" className="subscribe-pill">구독</a>
           </div>
         </div>
       </header>
@@ -104,7 +104,7 @@ export default function Header() {
       <header className="mobile-bar">
         <a href="/" aria-label="홈"><Wordmark /></a>
         <div className="mobile-actions">
-          <button className="subscribe-pill sm">구독</button>
+          <a href="/me" className="subscribe-pill sm">구독</a>
           <button className="icon-btn" aria-label="알림">{BellIcon}</button>
           <button className="icon-btn" aria-label="설정 메뉴" onClick={() => setOpen(true)}>{MenuIcon}</button>
         </div>

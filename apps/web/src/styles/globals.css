@@ -87,6 +87,7 @@ button { font-family:inherit; }
   font-family:var(--font-mono); font-size:11px; font-weight:600;
   letter-spacing:1.2px; text-transform:uppercase;
   padding:8px 16px; border-radius:var(--r-cta); border:none; cursor:pointer;
+  display:inline-block; text-decoration:none;
   transition:box-shadow 180ms ease, filter 180ms ease;
 }
 .subscribe-pill:hover { box-shadow:0 4px 14px rgba(0,103,177,.30); filter:brightness(1.05); color:#fff; }

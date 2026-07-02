@@ -43,7 +43,7 @@ export default async function ShortFeed() {
               <div className="sub-cta">
                 <h3>더 깊이 있는 뉴스를 매일</h3>
                 <p>구독하면 맞춤 브리핑과 원문 전문을 받아볼 수 있어요</p>
-                <button className="subscribe-pill">구독하기</button>
+                <a href="/me" className="subscribe-pill">구독하기</a>
               </div>
             )}
           </div>
