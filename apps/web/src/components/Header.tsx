@@ -114,6 +114,7 @@ export default function Header() {
       <nav className="mtabs">
         {TABS.map((t) => (
           <a key={t.href} href={t.href} className={`mtab${isActive(t.href) ? " active" : ""}`}>
+            <span className="mtab-ico" aria-hidden>{TAB_ICONS[t.href]}</span>
             {t.label}
           </a>
         ))}

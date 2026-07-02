@@ -154,13 +154,16 @@ button { font-family:inherit; }
   opacity:0; pointer-events:none; transform:translateY(-100%);
 }
 .mtab {
-  flex:1; text-align:center;
-  font-family:var(--font-mono); font-size:12px; letter-spacing:1.2px;
-  text-transform:uppercase; color:var(--text-secondary);
+  flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
+  font-family:var(--font-mono); font-size:12.5px; letter-spacing:.6px;
+  text-transform:uppercase; color:var(--text-secondary); font-weight:700;
   padding:9px 8px; border-radius:var(--r-cta); white-space:nowrap;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
   transition:all 160ms ease;
 }
-.mtab.active { background:var(--accent-fill); color:#fff; font-weight:600; }
+.mtab-ico { display:inline-flex; }
+.mtab-ico svg { width:17px; height:17px; display:block; }
+.mtab.active { background:var(--accent-fill); color:#fff; font-weight:800; }
 
 /* ============================================================
    드로어
