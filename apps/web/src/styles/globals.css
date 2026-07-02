@@ -240,10 +240,14 @@ button { font-family:inherit; }
   position:fixed; top:14px; left:18px; z-index:31;
   font-family:var(--font-ui); font-weight:900; font-size:22px; letter-spacing:-.5px;
   color:#fff; opacity:.5; text-shadow:0 1px 8px rgba(0,0,0,.55);
-  transition:opacity 150ms ease;
+  transition:opacity 220ms ease, transform 220ms ease;
 }
 .shorts-home:hover { opacity:.9; color:#fff; }
 .shorts-home .dot { color:var(--accent-fill); }
+/* 재생 중에는 메뉴바처럼 '노컷.' 도 슬라이드-아웃, 일시정지 시 다시 노출 */
+.media-playing .shorts-home {
+  opacity:0; pointer-events:none; transform:translateY(-140%);
+}
 .short-frame { position:absolute; inset:0; background:#000; }
 .short-frame iframe, .short-frame img {
   width:100%; height:100%; border:0; display:block; object-fit:cover;
