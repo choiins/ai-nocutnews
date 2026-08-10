@@ -96,24 +96,31 @@ alter table interests      enable row level security;
 alter table subscriptions  enable row level security;
 
 -- 공개 읽기: 게시된 기사 / 영상 / 카테고리는 누구나 조회
+drop policy if exists "public read published articles" on articles;
 create policy "public read published articles"
   on articles for select using (status = 'published');
 
+drop policy if exists "public read videos" on youtube_videos;
 create policy "public read videos"
   on youtube_videos for select using (true);
 
+drop policy if exists "public read categories" on categories;
 create policy "public read categories"
   on categories for select using (true);
 
 -- 관심사: 본인 것만 read/write
+drop policy if exists "own interests select" on interests;
 create policy "own interests select" on interests
   for select using (auth.uid() = user_id);
+drop policy if exists "own interests insert" on interests;
 create policy "own interests insert" on interests
   for insert with check (auth.uid() = user_id);
+drop policy if exists "own interests delete" on interests;
 create policy "own interests delete" on interests
   for delete using (auth.uid() = user_id);
 
 -- 구독: 본인 것만 read
+drop policy if exists "own subscription select" on subscriptions;
 create policy "own subscription select" on subscriptions
   for select using (auth.uid() = user_id);
 

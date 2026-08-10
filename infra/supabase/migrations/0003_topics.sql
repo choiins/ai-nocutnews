@@ -45,14 +45,19 @@ alter table article_topics enable row level security;
 alter table user_topics    enable row level security;
 
 -- 토픽/매핑은 공개 read (피드 노출용). 쓰기는 service_role(n8n 적재)만.
+drop policy if exists "public read topics" on topics;
 create policy "public read topics"         on topics         for select using (true);
+drop policy if exists "public read article_topics" on article_topics;
 create policy "public read article_topics" on article_topics for select using (true);
 
 -- 관심사는 본인 것만 read/write
+drop policy if exists "own user_topics select" on user_topics;
 create policy "own user_topics select" on user_topics
   for select using (auth.uid() = user_id);
+drop policy if exists "own user_topics insert" on user_topics;
 create policy "own user_topics insert" on user_topics
   for insert with check (auth.uid() = user_id);
+drop policy if exists "own user_topics delete" on user_topics;
 create policy "own user_topics delete" on user_topics
   for delete using (auth.uid() = user_id);
 

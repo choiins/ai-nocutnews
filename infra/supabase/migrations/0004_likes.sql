@@ -19,9 +19,12 @@ create index if not exists idx_article_likes_user on article_likes (user_id, cre
 -- ============================================================
 alter table article_likes enable row level security;
 
+drop policy if exists "own likes select" on article_likes;
 create policy "own likes select" on article_likes
   for select using (auth.uid() = user_id);
+drop policy if exists "own likes insert" on article_likes;
 create policy "own likes insert" on article_likes
   for insert with check (auth.uid() = user_id);
+drop policy if exists "own likes delete" on article_likes;
 create policy "own likes delete" on article_likes
   for delete using (auth.uid() = user_id);
