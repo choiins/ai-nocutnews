@@ -2,13 +2,12 @@
 import { useState, useEffect } from "react";
 import { useSession, useInterests } from "@/lib/session";
 import { useLikes } from "@/lib/likes";
-import { getArticlesByIds } from "@/lib/data";
 import {
-  getTopics, getTopicsBySlugs, getPersonalizedFeed, getRelatedArticles,
+  getTopics, getTopicsBySlugs, getPersonalizedFeed,
   type FeedItem,
 } from "@/lib/topics";
 import { feedTime } from "@/lib/time";
-import type { Article, Topic, TopicType } from "@shared/types";
+import type { Topic, TopicType } from "@shared/types";
 
 const TYPE_TABS: { key: TopicType; label: string }[] = [
   { key: "person", label: "인물" },
@@ -46,7 +45,7 @@ function FeedList({ feed }: { feed: FeedItem[] }) {
 
 export default function LikePage() {
   const { user, isLoggedIn, ready: sessionReady } = useSession();
-  const { ids: likedIds, toggle: toggleLike, ready: likesReady } = useLikes();
+  const { ids: likedIds, ready: likesReady } = useLikes();
   const { slugs, add, remove } = useInterests();
   const [q, setQ] = useState("");
   const [limitNotice, setLimitNotice] = useState("");
@@ -54,23 +53,10 @@ export default function LikePage() {
   // 추천 관심사로 한 번에 보여줄 최대 개수(전체)
   const RECO_MAX = 10;
 
-  // 좋아요한 기사 + 관련 기사
-  const [likedArticles, setLikedArticles] = useState<Article[]>([]);
-  const [related, setRelated] = useState<FeedItem[]>([]);
-
   // 관심사
   const [mine, setMine] = useState<Topic[]>([]);
   const [browse, setBrowse] = useState<Topic[]>([]);
   const [feed, setFeed] = useState<FeedItem[]>([]);
-
-  // 좋아요한 기사 본문 + 그 토픽 기반 관련 기사
-  useEffect(() => {
-    if (!likesReady) return;
-    let alive = true;
-    getArticlesByIds(likedIds).then((a) => { if (alive) setLikedArticles(a); });
-    getRelatedArticles(likedIds).then((r) => { if (alive) setRelated(r); });
-    return () => { alive = false; };
-  }, [likesReady, likedIds]);
 
   // 내 관심사 칩 + 관심사 맞춤 피드
   useEffect(() => {
@@ -130,42 +116,19 @@ export default function LikePage() {
         </div>
       )}
 
-      {/* ---------- 좋아요한 기사 ---------- */}
-      <section className="like-block">
-        <div className="side-head">좋아요한 기사</div>
-        {!likesReady ? (
-          <p className="like-hint">불러오는 중…</p>
-        ) : likedArticles.length === 0 ? (
-          <p className="like-hint">Short 피드에서 ♥ 좋아요를 누르면 여기에 모여요.</p>
-        ) : (
-          <div className="stream">
-            {likedArticles.map((a) => (
-              <div className="story" key={a.id}>
-                <a className="card" href={`/article/${a.id}`}>
-                  <div className="kicker">{feedTime(a.published_at)}</div>
-                  <div className="card-title">{a.ai_headline || a.title}</div>
-                  {a.summary_short && <p className="summary">{a.summary_short}</p>}
-                </a>
-                <button
-                  className="liked-remove"
-                  aria-label="좋아요 취소"
-                  onClick={() => toggleLike(a.id)}
-                >
-                  ♥ 좋아요 취소
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* ---------- 좋아요 기반 관련 기사 ---------- */}
-      {related.length > 0 && (
-        <section className="like-block">
-          <div className="side-head">좋아요한 주제의 다른 기사</div>
-          <FeedList feed={related} />
-        </section>
-      )}
+      {/* ---------- 좋아요한 기사 모아보기 (상단 요약 → 별도 페이지) ---------- */}
+      <a className="liked-summary" href="/like/saved">
+        <span className="liked-summary-heart">♥</span>
+        <span className="liked-summary-text">
+          <b>내가 좋아한 기사 모아보기</b>
+          <span className="liked-summary-sub">
+            {likesReady && likedIds.length > 0
+              ? `${likedIds.length}개의 기사를 저장했어요`
+              : "Short 피드에서 ♥ 를 누르면 여기에 모여요"}
+          </span>
+        </span>
+        <span className="liked-summary-arrow">→</span>
+      </a>
 
       {/* ---------- 내 관심사 ---------- */}
       <section className="like-block">

@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Article } from "@shared/types";
 import { useLikes } from "@/lib/likes";
+import { displayTitle } from "@/lib/title";
 
 // JoongAng "1min" 스타일 데스크톱 리더.
 // 가운데: 요약 기사 카드가 기존 방식대로 쭉 흐른다(연속 피드).
@@ -115,10 +116,13 @@ export default function DesktopReader({ articles }: { articles: Article[] }) {
               className={`jc-card${revealed[i] ? " revealed" : ""}${i === active ? " active" : ""}`}
             >
               <div className="jc-head">
-                <h1 className="jc-title">{a.ai_headline || a.title}</h1>
+                <h1 className="jc-title">{displayTitle(a.ai_headline || a.title)}</h1>
                 {a.thumbnail_url && <img className="jc-thumb" src={a.thumbnail_url} alt="" />}
               </div>
-              <div className="jc-meta">노컷뉴스 · 입력 {fmtDate(a.published_at)}</div>
+              <div className="jc-meta jc-meta-row">
+                <span>노컷뉴스 · 입력 {fmtDate(a.published_at)}</span>
+                {a.is_featured && <span className="pick-tag">Pick</span>}
+              </div>
 
               <div className="jc-body">
                 {bullets.length > 0 && (
@@ -158,7 +162,7 @@ export default function DesktopReader({ articles }: { articles: Article[] }) {
                   className={`pc-list-item${i === active ? " on" : ""}`}
                   onClick={() => scrollTo(i)}
                 >
-                  <span>{it.ai_headline || it.title}</span>
+                  <span>{displayTitle(it.ai_headline || it.title)}</span>
                 </button>
               </li>
             ))}

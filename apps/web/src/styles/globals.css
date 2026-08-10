@@ -207,6 +207,14 @@ button { font-family:inherit; }
 }
 .card:hover .card-title { color:var(--link-hover); }
 .card-title { font-size:20px; font-weight:700; line-height:1.25; color:var(--text-primary); }
+/* 에디터 pick 태그 — 시간 라인 오른쪽 끝에 붙는 작은 라벨 */
+.kicker-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.jc-meta-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.pick-tag {
+  flex:0 0 auto; font-family:var(--font-ui); font-weight:800; font-size:10px;
+  letter-spacing:.5px; text-transform:uppercase; color:#fff;
+  background:var(--accent-fill); padding:2px 8px; border-radius:999px;
+}
 .card .summary { margin-top:10px; font-size:15px; line-height:1.6; color:var(--text-muted); }
 .card .bullets { margin:12px 0 0; padding-left:0; list-style:none; }
 .card .bullets li {
@@ -400,6 +408,20 @@ button { font-family:inherit; }
 .sub-cta h3 { margin:0 0 6px; font-size:18px; }
 .sub-cta p { margin:0 0 14px; font-size:13px; color:var(--text-secondary); }
 
+/* ---------- 사이트 안내 / 디스클레이머 ---------- */
+.site-note {
+  margin:12px 0 4px; padding:16px 18px;
+  border:1px solid var(--image-frame); border-radius:var(--r-feature);
+  background:var(--surface-slate);
+}
+.site-note p {
+  margin:0; font-size:12px; line-height:1.7; color:var(--text-secondary);
+}
+.site-note p + p { margin-top:10px; }
+.site-note b { color:var(--text-muted); font-weight:600; }
+.site-note a { color:var(--accent-primary); text-decoration:none; }
+.site-note a:hover { text-decoration:underline; }
+
 /* ============================================================
    좋아요 버튼 (모바일 카드 등)
    ============================================================ */
@@ -425,6 +447,30 @@ button { font-family:inherit; }
   text-transform:uppercase; color:var(--accent-primary);
 }
 .liked-remove:hover { opacity:.7; }
+
+/* 좋아요 모아보기 — /like 상단 요약 링크 */
+.liked-summary {
+  display:flex; align-items:center; gap:14px; text-decoration:none;
+  background:var(--surface-slate); border:1px solid var(--image-frame);
+  border-radius:var(--r-feature); padding:16px 18px; margin-top:18px;
+  transition:border-color 140ms ease;
+}
+.liked-summary:hover { border-color:var(--accent-primary); }
+.liked-summary-heart {
+  flex-shrink:0; font-size:20px; line-height:1; color:var(--accent-primary);
+}
+.liked-summary-text { display:flex; flex-direction:column; gap:3px; flex:1; min-width:0; }
+.liked-summary-text b { font-size:15px; font-weight:800; color:var(--text-primary); }
+.liked-summary-sub { font-size:13px; color:var(--text-secondary); }
+.liked-summary-arrow { flex-shrink:0; color:var(--text-secondary); font-size:16px; }
+
+/* 뒤로 가기 링크 (/like/saved) */
+.back-link {
+  display:inline-block; margin-top:18px; text-decoration:none;
+  font-family:var(--font-mono); font-size:12px; letter-spacing:.5px;
+  color:var(--text-secondary);
+}
+.back-link:hover { color:var(--accent-primary); }
 
 /* ============================================================
    인증(/me) — 로그인·회원가입·계정
