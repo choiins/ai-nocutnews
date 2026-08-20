@@ -16,3 +16,5 @@ next-env.d.ts
 *.tsbuildinfo
 .vercel
 .env*
+# 단, 키 없는 템플릿은 추적한다 — README 셋업 절이 이 파일을 복사하라고 안내한다.
+!.env.example

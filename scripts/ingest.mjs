@@ -6,8 +6,8 @@
 // 필요 env:
 //   NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY  — service_role로 RLS 우회 적재
 //   OPENROUTER_API_KEY                                   — 요약용 (https://openrouter.ai/keys)
-//   OPENROUTER_MODEL (선택, 기본 moonshotai/kimi-k2.5)
-//     다른 모델: anthropic/claude-opus-4.8 등. 정확한 slug는 https://openrouter.ai/models 확인.
+//   OPENROUTER_MODEL (선택, 기본 google/gemini-2.5-flash)
+//     비추론 모델을 권장(아래 MODEL 주석 참고). 정확한 slug는 https://openrouter.ai/models 확인.
 //   RETENTION_DAYS (선택, 기본 30) — 이보다 오래된 RSS 기사는 수집 후 자동 삭제(무료 티어 용량 유지).
 //                                    --no-prune 플래그로 끌 수 있음.
 //
@@ -96,7 +96,7 @@ function parsePubDate(s) {
 }
 
 // ============================================================
-// 요약 — OpenRouter(OpenAI 호환) + SUMMARIZE_PROMPT.md 규칙
+// 요약 — OpenRouter(OpenAI 호환). 요약 규칙은 아래 SYSTEM_PROMPT에 인라인으로 둔다.
 // ============================================================
 const SYSTEM_PROMPT = `당신은 노컷뉴스의 AI 에디터입니다. 주어진 뉴스 원문을 모바일 독자가
 빠르게 파악할 수 있도록 요약합니다. 반드시 아래 규칙을 지키세요.
