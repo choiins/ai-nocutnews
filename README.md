@@ -80,7 +80,10 @@ npm run ingest -- --limit 10        # 미리보기는 --dry 추가
 
 **자동 실행:** `.github/workflows/ingest.yml`이 `cron: '17 0-14,21-23 * * *'`로 돈다 —
 **KST 06:00~24:00 사이 1시간 간격(하루 18회), KST 00~05시는 휴식.** 맥 전원과 무관하고 무료다.
-키는 GitHub Actions Secrets로 주입한다. 로컬에서 직접 돌릴 땐:
+키는 GitHub Actions Secrets로 주입한다.
+GitHub는 저장소에 60일간 커밋이 없으면 예약 워크플로를 끈다(2026-10에 실제로 7일 중단됨) —
+그래서 워크플로 마지막 `Keepalive` 단계가 매 실행마다 enable API를 호출해 스스로 켜진 상태를 유지한다.
+그래도 꺼져 있으면 `gh workflow enable ingest.yml`. 로컬에서 직접 돌릴 땐:
 ```bash
 node --env-file=apps/web/.env.local scripts/ingest.mjs
 ```
